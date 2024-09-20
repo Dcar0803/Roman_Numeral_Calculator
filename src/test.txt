@@ -1,0 +1,7 @@
+for character in range(len(roman)):
+        value = roman_numerals_to_integers.get(character, None ) #get() returns the value of the item with the  
+        if value is None:
+            raise ValueError("This is an invalid roman numeral")
+        
+        if value > previous_number:
+            print

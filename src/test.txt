@@ -5,3 +5,8 @@ for character in range(len(roman)):
         
         if value > previous_number:
             print
+
+Roman Numeral notes for the is_valid_roman() function in the roman_numeral.py:
+    This checks # Tens - 90 (XC), 40 (XL), 0-30 (0 to 3 X's), or 50-80 (L followed by 0 to 3 X's)
+    # Ones - 9 (IX), 4 (IV), 0-3 (0 to 3 I's), or 5-8 (V followed by 0 to 3 I's)
+    # Hundreds - 900 (CM), 400 (CD), 0-300 (0 to 3 C's), or 500-800 (D followed by 0 to 3 C's)

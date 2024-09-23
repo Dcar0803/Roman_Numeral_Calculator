@@ -1,3 +1,5 @@
+import re
+
 # Roman Numerals to Integers
 roman_numerals_to_integers = {
     "I": 1, "IV": 4, "V": 5, "IX": 9, "X": 10, "XL": 40, "L": 50,
@@ -11,8 +13,24 @@ integers_to_roman_numerals = [
     (5, 'V'), (4, 'IV'), (1, 'I')
 ]
 
+def is_valid_roman(numeral):
+    """
+    Check if a Roman numeral string is valid according to the rules.
+    The largest valid Roman numeral is 3999 (MMMCMXCIX).
+    """
+    valid_roman_pattern = (
+        r"^M{0,3}"  # Thousands - 0 to 3 M's
+        r"(CM|CD|D?C{0,3})"  
+        r"(XC|XL|L?X{0,3})"  
+        r"(IX|IV|V?I{0,3})$"  
+    )
+    return re.match(valid_roman_pattern, numeral) is not None
+
 def roman_to_integer(roman):
-    '''Converts a Roman numeral to an integer'''
+    '''Converts a Roman numeral to an integer after validating its correctness'''
+    if not is_valid_roman(roman):
+        raise ValueError(f"Invalid Roman numeral: {roman}")
+
     result = 0
     # Loop through each character in the Roman numeral string
     for character in range(len(roman)):

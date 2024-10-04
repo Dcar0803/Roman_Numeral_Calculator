@@ -2,18 +2,33 @@ import sys
 import re
 from roman_numerals import roman_to_integer, integer_to_roman
 
+
 class Node:
-    """Node class for representing the components of an expression."""
+    """
+    Node class for representing the components of an expression.
+    
+    Attributes:
+        value (int or str): The value of the node 
+        left (Node): Left child node.
+        right (Node): Right child node.
+        operator (str): Operator for the node ('+', '-', '*', '/').
+    """
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
         self.operator = None
 
+
 class RomanNumeralCalculator:
     @staticmethod
     def main():
-        """The main function to run the Roman numeral calculator."""
+        """
+        Main function to run the Roman numeral calculator.
+
+        Raises:
+            ValueError: If the provided input is invalid (non-Roman numerals or invalid numeric expressions).
+        """
         if len(sys.argv) < 2:
             print("The calculator requires an expression to calculate.")
             return
@@ -23,7 +38,6 @@ class RomanNumeralCalculator:
         # Check if the expression is just a single Roman numeral without operations
         if re.fullmatch(r'[IVXLCDM]+', expression.strip()):
             try:
-                # Convert Roman numeral to integer and print it
                 result = roman_to_integer(expression.strip())
                 print(result)
                 return
@@ -31,20 +45,35 @@ class RomanNumeralCalculator:
                 print("I don't know how to read this.")
                 return
 
-        
         result = RomanNumeralCalculator.eval_expression(expression)
         print(result)
 
     @staticmethod
     def eval_expression(expression):
-        """Evaluate the Roman numeral expression."""
+        """
+        Evaluate the Roman numeral expression.
+
+        Args:
+            expression (str): The Roman numeral expression.
+
+        Returns:
+            str: The result of the evaluation or an error message.
+
+        Raises:
+            ValueError: If the expression contains invalid Roman numerals or operators.
+            ZeroDivisionError: If the expression contains division by zero.
+        """
         expression = re.sub(r'\s+', '', expression)
 
-        # Replace Roman numerals with the integer
+        # Replace Roman numerals with integers
         try:
             expression = re.sub(r'[IVXLCDM]+', lambda x: str(roman_to_integer(x.group())), expression)
         except ValueError:
             return "I don't know how to read this."
+
+        # Handle floating-point or non-integer inputs
+        if re.search(r'\d+\.\d+', expression):
+            return "Roman numerals can't represent fractions."
 
         # Parse and evaluate the expression with operator precedence
         try:
@@ -63,31 +92,52 @@ class RomanNumeralCalculator:
 
     @staticmethod
     def _evaluate_tree(expression):
-        """Convert the expression into a tree and evaluate it."""
-        # Handle parentheses and brackets
-        expression = RomanNumeralCalculator._replace_grouping(expression)
+        """
+        Convert the expression into a tree and evaluate it.
 
-        # Build and evaluate expression tree
+        Args:
+            expression (str): The Roman numeral expression (converted to integers).
+
+        Returns:
+            int: The result of evaluating the expression tree.
+
+        Raises:
+            ZeroDivisionError: If division by zero occurs.
+            ValueError: If the expression contains invalid syntax or characters.
+        """
+        expression = RomanNumeralCalculator._replace_grouping(expression)
         root = RomanNumeralCalculator._build_tree(expression)
         return RomanNumeralCalculator._evaluate_node(root)
 
     @staticmethod
     def _replace_grouping(expression):
-        """Replace brackets with parentheses for consistent parsing."""
-        expression = expression.replace('[', '(').replace(']', ')')
-        return expression
+        """
+        Replace brackets with parentheses for consistent parsing.
+
+        Args:
+            expression (str): The mathematical expression.
+
+        Returns:
+            str: The expression with replaced groupings.
+        """
+        return expression.replace('[', '(').replace(']', ')')
 
     @staticmethod
     def _build_tree(expression):
-        """Build a tree for the expression with correct operator precedence."""
-        # Use a stack-based approach to build an expression tree with precedence
-        # Define operators precedence
+        """
+        Build an expression tree from the given expression string with operator precedence.
+
+        Args:
+            expression (str): The mathematical expression in infix notation.
+
+        Returns:
+            Node: The root of the expression tree.
+        """
         precedence = {'+': 1, '-': 1, '*': 2, '/': 2}
-        
         tokens = re.findall(r'\d+|[()+*/-]', expression)
         stack = []
         output = []
-        
+
         for token in tokens:
             if token.isdigit():
                 output.append(Node(int(token)))
@@ -109,7 +159,15 @@ class RomanNumeralCalculator:
 
     @staticmethod
     def _construct_tree(postfix):
-        """Constructs an expression tree from postfix notation."""
+        """
+        Construct an expression tree from postfix notation.
+
+        Args:
+            postfix (list): List of Nodes in postfix order.
+
+        Returns:
+            Node: The root of the constructed expression tree.
+        """
         stack = []
         for token in postfix:
             if isinstance(token.value, int):
@@ -123,10 +181,21 @@ class RomanNumeralCalculator:
 
     @staticmethod
     def _evaluate_node(node):
-        """Evaluate the tree from the given node."""
+        """
+        Evaluate the expression tree from the given node.
+
+        Args:
+            node (Node): The current node in the expression tree.
+
+        Returns:
+            int: The result of evaluating the tree.
+
+        Raises:
+            ZeroDivisionError: If division by zero occurs.
+        """
         if isinstance(node.value, int):
             return node.value
-        
+
         left_value = RomanNumeralCalculator._evaluate_node(node.left)
         right_value = RomanNumeralCalculator._evaluate_node(node.right)
 
@@ -141,6 +210,6 @@ class RomanNumeralCalculator:
                 raise ZeroDivisionError
             return left_value // right_value
 
-# Run the program when called from the command line
+
 if __name__ == "__main__":
     RomanNumeralCalculator.main()
